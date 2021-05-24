@@ -12,9 +12,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: login gh container registry
+      run:  echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
     - name: pull docker image
-      run: docker pull ${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/} || true
+      run: docker pull ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/} || true
     - name: Build docker image
-      run: docker build --tag ${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/} .
+      run: docker build --tag ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/} .
     - name: Push Docker image
-      run: echo docker push ${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/}
+      run: docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/}
