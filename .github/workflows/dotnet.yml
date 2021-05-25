@@ -1,0 +1,22 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ master,gh-action ]
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: login gh container registry
+      run:  echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
+    - name: pull docker image
+      run: docker pull ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/} || true
+    - name: Build docker image
+      run: docker build --tag ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/} .
+    - name: Push Docker image
+      run: docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF#refs/heads/}
